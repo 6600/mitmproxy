@@ -43,14 +43,16 @@ async def hello(uri):
                 break
               # 设置缓存
               client['tempList'].append(messageId)
+              if ('needBody' in client['config']):
+                response = requests.get('http://127.0.1.1:8081/flows/' + messageId + '/response/content.data', headers={})
+                response.encoding='utf-8'
+                response2 = requests.get('http://127.0.1.1:8081/flows/' + messageId + '/request/content.data', headers={})
+                response2.encoding='utf-8'
+                data['data']['request']['data'] = response2.text
+                data['data']['response']['data'] = response.text
               # print(message)
-              response = requests.get('http://49.233.24.238:8081/flows/' + messageId + '/response/content.data', headers={})
-              response.encoding='utf-8'
-              response2 = requests.get('http://49.233.24.238:8081/flows/' + messageId + '/request/content.data', headers={})
-              response2.encoding='utf-8'
+              
               data['data']['request']['url'] = url
-              data['data']['request']['data'] = response2.text
-              data['data']['response']['data'] = response.text
               try:
                 await client['client'].send(json.dumps(data['data']))
               except:
